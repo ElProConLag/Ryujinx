@@ -54,7 +54,7 @@ namespace Ryujinx.HLE.HOS.Services.Fs
             string switchPath = ReadUtf8String(context);
             string fullPath = FileSystem.VirtualFileSystem.SwitchPathToSystemPath(switchPath);
 
-            if (!File.Exists(fullPath))
+            if (fullPath == null || !File.Exists(fullPath))
             {
                 if (fullPath.Contains('.'))
                 {

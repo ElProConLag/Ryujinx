@@ -104,6 +104,9 @@ namespace Ryujinx.HLE.FileSystem
             string combinedPath = Path.Combine(basePath, fileName);
             string fullPath = Path.GetFullPath(combinedPath);
 
+            // Normalize the path to remove any redundant components
+            fullPath = Path.GetFullPath(new Uri(fullPath).LocalPath);
+
             if (!fullPath.StartsWith(Path.GetFullPath(AppDataManager.BaseDirPath) + Path.DirectorySeparatorChar))
             {
                 return null;
