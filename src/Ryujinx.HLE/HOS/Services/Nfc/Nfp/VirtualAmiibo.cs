@@ -165,9 +165,16 @@ namespace Ryujinx.HLE.HOS.Services.Nfc.Nfp
 
         private static VirtualAmiiboFile LoadAmiiboFile(string amiiboId)
         {
-            Directory.CreateDirectory(Path.Join(AppDataManager.BaseDirPath, "system", "amiibo"));
+            string amiiboDir = Path.GetFullPath(Path.Join(AppDataManager.BaseDirPath, "system", "amiibo"));
 
-            string filePath = Path.Join(AppDataManager.BaseDirPath, "system", "amiibo", $"{amiiboId}.json");
+            if (!amiiboDir.StartsWith(Path.GetFullPath(AppDataManager.BaseDirPath)))
+            {
+                throw new UnauthorizedAccessException("Invalid path");
+            }
+
+            Directory.CreateDirectory(amiiboDir);
+
+            string filePath = Path.Join(amiiboDir, $"{amiiboId}.json");
 
             VirtualAmiiboFile virtualAmiiboFile;
 
@@ -196,7 +203,14 @@ namespace Ryujinx.HLE.HOS.Services.Nfc.Nfp
 
         private static void SaveAmiiboFile(VirtualAmiiboFile virtualAmiiboFile)
         {
-            string filePath = Path.Join(AppDataManager.BaseDirPath, "system", "amiibo", $"{virtualAmiiboFile.AmiiboId}.json");
+            string amiiboDir = Path.GetFullPath(Path.Join(AppDataManager.BaseDirPath, "system", "amiibo"));
+
+            if (!amiiboDir.StartsWith(Path.GetFullPath(AppDataManager.BaseDirPath)))
+            {
+                throw new UnauthorizedAccessException("Invalid path");
+            }
+
+            string filePath = Path.Join(amiiboDir, $"{virtualAmiiboFile.AmiiboId}.json");
             JsonHelper.SerializeToFile(filePath, virtualAmiiboFile, _serializerContext.VirtualAmiiboFile);
         }
     }
