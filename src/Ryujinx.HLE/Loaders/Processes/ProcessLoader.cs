@@ -34,7 +34,16 @@ namespace Ryujinx.HLE.Loaders.Processes
 
         public bool LoadXci(string path, ulong applicationId)
         {
-            FileStream stream = new(path, FileMode.Open, FileAccess.Read);
+            string baseDirectory = AppDataManager.BaseDirPath; // Define a safe base directory
+            string fullPath = Path.GetFullPath(path);
+
+            if (!fullPath.StartsWith(baseDirectory + Path.DirectorySeparatorChar))
+            {
+                Logger.Error?.Print(LogClass.Loader, "Invalid path: Access outside of the base directory is not allowed.");
+                return false;
+            }
+
+            FileStream stream = new(fullPath, FileMode.Open, FileAccess.Read);
             Xci xci = new(_device.Configuration.VirtualFileSystem.KeySet, stream.AsStorage());
 
             if (!xci.HasPartition(XciPartitionType.Secure))
