@@ -405,9 +405,16 @@ namespace Ryujinx.Modules
                                 continue;
                             }
 
-                            string outPath = Path.Combine(_updateDir, tarEntry.Name);
+                            string entryName = tarEntry.Name;
+                            string outPath = Path.Combine(_updateDir, entryName);
+                            string fullPath = Path.GetFullPath(outPath);
 
-                            Directory.CreateDirectory(Path.GetDirectoryName(outPath));
+                            if (!fullPath.StartsWith(_updateDir))
+                            {
+                                throw new UnauthorizedAccessException("Invalid entry name in tar archive.");
+                            }
+
+                            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 
                             using FileStream outStream = File.OpenWrite(outPath);
                             tarStream.CopyEntryContents(outStream);
