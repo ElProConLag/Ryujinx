@@ -101,9 +101,10 @@ namespace Ryujinx.HLE.FileSystem
                 return null;
             }
 
-            string fullPath = Path.GetFullPath(Path.Combine(basePath, fileName));
+            string combinedPath = Path.Combine(basePath, fileName);
+            string fullPath = Path.GetFullPath(combinedPath);
 
-            if (!fullPath.StartsWith(AppDataManager.BaseDirPath))
+            if (!fullPath.StartsWith(Path.GetFullPath(AppDataManager.BaseDirPath) + Path.DirectorySeparatorChar))
             {
                 return null;
             }
