@@ -14,7 +14,7 @@ namespace Ryujinx.UI.Common.Helper
         private static readonly string[] _fileExtensions = { ".nca", ".nro", ".nso", ".nsp", ".xci" };
 
         [SupportedOSPlatform("linux")]
-        private static readonly string _mimeDbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share", "mime");
+        private static readonly string _mimeDbPath = ValidateMimeDbPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share", "mime"));
 
         private const int SHCNE_ASSOCCHANGED = 0x8000000;
         private const int SHCNF_FLUSH = 0x1000;
@@ -67,6 +67,16 @@ namespace Ryujinx.UI.Common.Helper
             }
 
             return true;
+        }
+
+        private static string ValidateMimeDbPath(string path)
+        {
+            string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if (!path.StartsWith(userProfile) || path.Contains(";") || path.Contains("&") || path.Contains("|"))
+            {
+                throw new InvalidOperationException("Invalid mime database path.");
+            }
+            return path;
         }
 
         [SupportedOSPlatform("windows")]
