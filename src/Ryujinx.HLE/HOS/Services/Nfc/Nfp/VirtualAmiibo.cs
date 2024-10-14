@@ -165,6 +165,11 @@ namespace Ryujinx.HLE.HOS.Services.Nfc.Nfp
 
         private static VirtualAmiiboFile LoadAmiiboFile(string amiiboId)
         {
+            if (amiiboId.Contains("..") || amiiboId.Contains("/") || amiiboId.Contains("\\"))
+            {
+                throw new ArgumentException("Invalid amiiboId");
+            }
+
             string amiiboDir = Path.GetFullPath(Path.Join(AppDataManager.BaseDirPath, "system", "amiibo"));
 
             if (!amiiboDir.StartsWith(Path.GetFullPath(AppDataManager.BaseDirPath)))
@@ -203,6 +208,11 @@ namespace Ryujinx.HLE.HOS.Services.Nfc.Nfp
 
         private static void SaveAmiiboFile(VirtualAmiiboFile virtualAmiiboFile)
         {
+            if (virtualAmiiboFile.AmiiboId.Contains("..") || virtualAmiiboFile.AmiiboId.Contains("/") || virtualAmiiboFile.AmiiboId.Contains("\\"))
+            {
+                throw new ArgumentException("Invalid amiiboId");
+            }
+
             string amiiboDir = Path.GetFullPath(Path.Join(AppDataManager.BaseDirPath, "system", "amiibo"));
 
             if (!amiiboDir.StartsWith(Path.GetFullPath(AppDataManager.BaseDirPath)))
