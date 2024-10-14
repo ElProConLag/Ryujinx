@@ -115,6 +115,12 @@ namespace Ryujinx.HLE.FileSystem
                     }
                     var registeredDirectory = Path.Combine(contentDirectory, "registered");
 
+                    if (!IsValidPath(registeredDirectory, contentDirectory))
+                    {
+                        Logger.Warning?.Print(LogClass.Application, $"Invalid path detected: {registeredDirectory}");
+                        continue;
+                    }
+
                     Directory.CreateDirectory(registeredDirectory);
 
                     LinkedList<LocationEntry> locationList = new();
@@ -968,4 +974,10 @@ namespace Ryujinx.HLE.FileSystem
             return null;
         }
     }
-}
+                private bool IsValidPath(string path, string baseDirectory)
+                {
+                    string fullPath = Path.GetFullPath(path);
+                    return fullPath.StartsWith(baseDirectory + Path.DirectorySeparatorChar) &&
+                           !path.Contains("..") && !path.Contains("/") && !path.Contains("\\");
+                }
+            }
