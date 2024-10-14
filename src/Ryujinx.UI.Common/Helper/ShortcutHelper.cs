@@ -151,6 +151,12 @@ namespace Ryujinx.UI.Common.Helper
         [SupportedOSPlatform("windows")]
         private static void SaveBitmapAsIcon(SKBitmap source, string filePath)
         {
+            // Validate the file path
+            if (!IsValidFilePath(filePath))
+            {
+                throw new ArgumentException("Invalid file path.");
+            }
+
             // Code Modified From https://stackoverflow.com/a/11448060/368354 by Benlitz
             byte[] header = { 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 32, 0, 0, 0, 0, 0, 22, 0, 0, 0 };
             using FileStream fs = new(filePath, FileMode.Create);
@@ -167,6 +173,13 @@ namespace Ryujinx.UI.Common.Helper
             fs.WriteByte((byte)(dataLength >> 8));
             fs.WriteByte((byte)(dataLength >> 16));
             fs.WriteByte((byte)(dataLength >> 24));
+        }
+
+        private static bool IsValidFilePath(string filePath)
+        {
+            string baseDirPath = AppDataManager.BaseDirPath;
+            string fullPath = Path.GetFullPath(filePath);
+            return fullPath.StartsWith(baseDirPath + Path.DirectorySeparatorChar);
         }
     }
 }
