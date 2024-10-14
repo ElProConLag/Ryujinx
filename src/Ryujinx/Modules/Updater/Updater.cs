@@ -523,10 +523,16 @@ namespace Ryujinx.Modules
                 }
 
                 string outPath = Path.Combine(outputDirectoryPath, tarEntry.Name);
+                string fullPath = Path.GetFullPath(outPath);
 
-                Directory.CreateDirectory(Path.GetDirectoryName(outPath));
+                if (!fullPath.StartsWith(Path.GetFullPath(outputDirectoryPath)))
+                {
+                    throw new UnauthorizedAccessException("Attempt to write outside of the target directory.");
+                }
 
-                using FileStream outStream = File.OpenWrite(outPath);
+                Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+
+                using FileStream outStream = File.OpenWrite(fullPath);
                 tarStream.CopyEntryContents(outStream);
 
                 File.SetUnixFileMode(outPath, (UnixFileMode)tarEntry.TarHeader.Mode);
@@ -559,11 +565,17 @@ namespace Ryujinx.Modules
                 }
 
                 string outPath = Path.Combine(outputDirectoryPath, zipEntry.Name);
+                string fullPath = Path.GetFullPath(outPath);
 
-                Directory.CreateDirectory(Path.GetDirectoryName(outPath));
+                if (!fullPath.StartsWith(Path.GetFullPath(outputDirectoryPath)))
+                {
+                    throw new UnauthorizedAccessException("Attempt to write outside of the target directory.");
+                }
+
+                Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 
                 using Stream zipStream = zipFile.GetInputStream(zipEntry);
-                using FileStream outStream = File.OpenWrite(outPath);
+                using FileStream outStream = File.OpenWrite(fullPath);
 
                 zipStream.CopyTo(outStream);
 
