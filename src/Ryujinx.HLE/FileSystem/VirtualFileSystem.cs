@@ -187,7 +187,7 @@ namespace Ryujinx.HLE.FileSystem
             string fullPath = Path.GetFullPath(Path.Combine(AppDataManager.BaseDirPath, path));
 
             // Ensure the fullPath is within the BaseDirPath
-            if (!fullPath.StartsWith(AppDataManager.BaseDirPath + Path.DirectorySeparatorChar))
+            if (!IsValidFullPath(fullPath, AppDataManager.BaseDirPath))
             {
                 throw new ArgumentException("Invalid path: Path traversal detected");
             }
@@ -209,6 +209,15 @@ namespace Ryujinx.HLE.FileSystem
             }
 
             return true;
+        }
+
+        private static bool IsValidFullPath(string fullPath, string baseDirPath)
+        {
+            // Normalize the base directory path
+            string normalizedBaseDirPath = Path.GetFullPath(baseDirPath);
+
+            // Ensure the fullPath is within the BaseDirPath
+            return fullPath.StartsWith(normalizedBaseDirPath + Path.DirectorySeparatorChar);
         }
 
         public void InitializeFsServer(LibHac.Horizon horizon, out HorizonClient fsServerClient)
