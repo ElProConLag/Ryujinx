@@ -30,7 +30,7 @@ namespace Ryujinx.Modules
         internal static bool Running;
 
         private static readonly string _homeDir = AppDomain.CurrentDomain.BaseDirectory;
-        private static readonly string _updateDir = Path.Combine(Path.GetTempPath(), "Ryujinx", "update");
+        private static readonly string _updateDir = GetValidatedTempPath("Ryujinx", "update");
         private static readonly string _updatePublishDir = Path.Combine(_updateDir, "publish");
 
         private static string _buildVer;
@@ -51,6 +51,27 @@ namespace Ryujinx.Modules
             result.DefaultRequestHeaders.Add("User-Agent", "Ryujinx-Updater/1.0.0");
 
             return result;
+        }
+
+        private static string GetValidatedTempPath(params string[] paths)
+        {
+            string tempPath = Path.GetTempPath();
+            string combinedPath = Path.Combine(new[] { tempPath }.Concat(paths).ToArray());
+
+            if (!IsPathWithinTempDirectory(combinedPath))
+            {
+                throw new UnauthorizedAccessException("Invalid temporary directory path.");
+            }
+
+            return combinedPath;
+        }
+
+        private static bool IsPathWithinTempDirectory(string path)
+        {
+            string tempPath = Path.GetTempPath();
+            string fullPath = Path.GetFullPath(path);
+
+            return fullPath.StartsWith(tempPath, StringComparison.OrdinalIgnoreCase);
         }
 
         public static async Task BeginParse(MainWindow mainWindow, bool showVersionUpToDate)
@@ -204,6 +225,12 @@ namespace Ryujinx.Modules
 
         public static void UpdateRyujinx(UpdateDialog updateDialog, string downloadUrl)
         {
+            // Validate the update directory path
+            if (!IsPathWithinTempDirectory(_updateDir))
+            {
+                throw new UnauthorizedAccessException("Invalid update directory path.");
+            }
+
             // Empty update dir, although it shouldn't ever have anything inside it
             if (Directory.Exists(_updateDir))
             {
