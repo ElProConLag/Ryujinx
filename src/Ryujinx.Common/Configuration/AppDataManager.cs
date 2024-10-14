@@ -83,14 +83,26 @@ namespace Ryujinx.Common.Configuration
 
             if (baseDirPath != null && baseDirPath != userProfilePath)
             {
-                if (!Directory.Exists(baseDirPath))
+                if (baseDirPath.Contains("..") || baseDirPath.Contains("/") || baseDirPath.Contains("\\"))
+                {
+                    Logger.Error?.Print(LogClass.Application, $"Invalid custom data directory '{baseDirPath}'. Falling back to {Mode}...");
+                }
+                else if (!Directory.Exists(baseDirPath))
                 {
                     Logger.Error?.Print(LogClass.Application, $"Custom Data Directory '{baseDirPath}' does not exist. Falling back to {Mode}...");
                 }
                 else
                 {
-                    BaseDirPath = baseDirPath;
-                    Mode = LaunchMode.Custom;
+                    string fullPath = Path.GetFullPath(baseDirPath);
+                    if (!fullPath.StartsWith(Path.GetFullPath(userProfilePath) + Path.DirectorySeparatorChar))
+                    {
+                        Logger.Error?.Print(LogClass.Application, $"Custom Data Directory '{baseDirPath}' is outside the allowed directory. Falling back to {Mode}...");
+                    }
+                    else
+                    {
+                        BaseDirPath = fullPath;
+                        Mode = LaunchMode.Custom;
+                    }
                 }
             }
 
