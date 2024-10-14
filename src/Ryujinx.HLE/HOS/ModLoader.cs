@@ -265,7 +265,9 @@ namespace Ryujinx.HLE.HOS
             string modJsonPath = Path.Combine(AppDataManager.GamesDirPath, applicationId.ToString("x16"), "mods.json");
             string fullModJsonPath = Path.GetFullPath(modJsonPath);
 
-            if (!fullModJsonPath.StartsWith(Path.GetFullPath(AppDataManager.GamesDirPath) + Path.DirectorySeparatorChar))
+            // Ensure the path is within the expected base directory and does not contain path traversal sequences
+            if (!fullModJsonPath.StartsWith(Path.GetFullPath(AppDataManager.GamesDirPath) + Path.DirectorySeparatorChar) ||
+                fullModJsonPath.Contains("..") || fullModJsonPath.Contains(Path.DirectorySeparatorChar + ".") || fullModJsonPath.Contains("." + Path.DirectorySeparatorChar))
             {
                 Logger.Warning?.Print(LogClass.ModLoader, $"Invalid mod path: {fullModJsonPath}");
                 return;
