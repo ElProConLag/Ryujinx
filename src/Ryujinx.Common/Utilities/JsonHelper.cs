@@ -49,8 +49,23 @@ namespace Ryujinx.Common.Utilities
 
         public static T DeserializeFromFile<T>(string filePath, JsonTypeInfo<T> typeInfo)
         {
+            if (!IsValidPath(filePath))
+            {
+                throw new ArgumentException("Invalid file path.");
+            }
             using FileStream file = File.OpenRead(filePath);
             return JsonSerializer.Deserialize(file, typeInfo);
+        }
+
+        private static bool IsValidPath(string filePath)
+        {
+            string baseDir = AppDataManager.GamesDirPath;
+            string fullPath = Path.GetFullPath(filePath);
+
+            return fullPath.StartsWith(baseDir + Path.DirectorySeparatorChar) &&
+                   !fullPath.Contains("..") &&
+                   !fullPath.Contains(Path.DirectorySeparatorChar + ".") &&
+                   !fullPath.Contains("." + Path.DirectorySeparatorChar);
         }
 
         public static void SerializeToStream<T>(Stream stream, T value, JsonTypeInfo<T> typeInfo)
