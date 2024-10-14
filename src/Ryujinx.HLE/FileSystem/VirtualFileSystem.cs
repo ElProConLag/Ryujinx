@@ -184,7 +184,13 @@ namespace Ryujinx.HLE.FileSystem
                     break;
             }
 
-            string fullPath = Path.Combine(AppDataManager.BaseDirPath, path);
+            string fullPath = Path.GetFullPath(Path.Combine(AppDataManager.BaseDirPath, path));
+
+            // Ensure the fullPath is within the BaseDirPath
+            if (!fullPath.StartsWith(AppDataManager.BaseDirPath + Path.DirectorySeparatorChar))
+            {
+                throw new ArgumentException("Invalid path: Path traversal detected");
+            }
 
             if (isDirectory && !Directory.Exists(fullPath))
             {
