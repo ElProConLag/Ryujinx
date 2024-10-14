@@ -34,6 +34,13 @@ namespace Ryujinx.HLE.Loaders.Processes
 
         public bool LoadXci(string path, ulong applicationId)
         {
+            // Validate the path to prevent directory traversal
+            if (path.Contains("..") || path.Contains("/") || path.Contains("\\"))
+            {
+                Logger.Error?.Print(LogClass.Loader, "Invalid path: Path traversal detected.");
+                return false;
+            }
+
             string baseDirectory = AppDataManager.BaseDirPath; // Define a safe base directory
             string fullPath = Path.GetFullPath(path);
 
