@@ -42,6 +42,14 @@ namespace Ryujinx.Modules
         private static string _buildVer;
         private static string _platformExt;
         private static string _buildUrl;
+
+        private static void ValidatePath(string path)
+        {
+            if (path.Contains("..") || path.Contains("/") || path.Contains("\\"))
+            {
+                throw new UnauthorizedAccessException("Invalid path.");
+            }
+        }
         private static long _buildSize;
         private static bool _updateSuccessful;
         private static bool _running;
@@ -509,6 +517,8 @@ namespace Ryujinx.Modules
         [SupportedOSPlatform("macos")]
         private static void ExtractTarGzipFile(TaskDialog taskDialog, string archivePath, string outputDirectoryPath)
         {
+            ValidatePath(outputDirectoryPath);
+
             using Stream inStream = File.OpenRead(archivePath);
             using GZipInputStream gzipStream = new(inStream);
             using TarInputStream tarStream = new(gzipStream, Encoding.ASCII);
@@ -552,6 +562,8 @@ namespace Ryujinx.Modules
 
         private static void ExtractZipFile(TaskDialog taskDialog, string archivePath, string outputDirectoryPath)
         {
+            ValidatePath(outputDirectoryPath);
+
             using Stream inStream = File.OpenRead(archivePath);
             using ZipFile zipFile = new(inStream);
 
