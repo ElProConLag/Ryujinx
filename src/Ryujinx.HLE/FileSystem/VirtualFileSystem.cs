@@ -155,6 +155,12 @@ namespace Ryujinx.HLE.FileSystem
 
         private static string MakeFullPath(string path, bool isDirectory = true)
         {
+            // Validate the path to prevent directory traversal
+            if (!IsValidPath(path))
+            {
+                throw new ArgumentException("Invalid path");
+            }
+
             // Handles Common Switch Content Paths
             switch (path)
             {
@@ -186,6 +192,17 @@ namespace Ryujinx.HLE.FileSystem
             }
 
             return fullPath;
+        }
+
+        private static bool IsValidPath(string path)
+        {
+            // Check for invalid path characters and sequences
+            if (path.Contains("..") || path.Contains("/") || path.Contains("\\"))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public void InitializeFsServer(LibHac.Horizon horizon, out HorizonClient fsServerClient)
