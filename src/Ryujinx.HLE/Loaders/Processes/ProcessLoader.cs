@@ -84,7 +84,23 @@ namespace Ryujinx.HLE.Loaders.Processes
 
         public bool LoadNsp(string path, ulong applicationId)
         {
-            FileStream file = new(path, FileMode.Open, FileAccess.Read);
+            // Validate the path to prevent directory traversal
+            if (path.Contains("..") || path.Contains("/") || path.Contains("\\"))
+            {
+                Logger.Error?.Print(LogClass.Loader, "Invalid path: Path traversal detected.");
+                return false;
+            }
+
+            string baseDirectory = AppDataManager.BaseDirPath; // Define a safe base directory
+            string fullPath = Path.GetFullPath(path);
+
+            if (!fullPath.StartsWith(baseDirectory + Path.DirectorySeparatorChar))
+            {
+                Logger.Error?.Print(LogClass.Loader, "Invalid path: Access outside of the base directory is not allowed.");
+                return false;
+            }
+
+            FileStream file = new(fullPath, FileMode.Open, FileAccess.Read);
             PartitionFileSystem partitionFileSystem = new();
             partitionFileSystem.Initialize(file.AsStorage()).ThrowIfFailure();
 
