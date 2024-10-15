@@ -785,6 +785,13 @@ namespace Ryujinx.UI.Windows
             return fullPath.StartsWith(basePath + Path.DirectorySeparatorChar);
         }
 
+        private bool IsBasePathValid(string basePath)
+        {
+            string profilesDirPath = Path.GetFullPath(AppDataManager.ProfilesDirPath);
+            string fullPath = Path.GetFullPath(basePath);
+            return fullPath.StartsWith(profilesDirPath + Path.DirectorySeparatorChar);
+        }
+
         //
         // Events
         //
@@ -951,6 +958,12 @@ namespace Ryujinx.UI.Windows
             _profile.RemoveAll();
 
             string basePath = GetProfileBasePath();
+
+            if (!IsBasePathValid(basePath))
+            {
+                Logger.Error.Print(LogClass.Application, "Invalid base path for profiles.");
+                return;
+            }
 
             if (!Directory.Exists(basePath))
             {
