@@ -165,10 +165,7 @@ namespace Ryujinx.HLE.HOS.Services.Nfc.Nfp
 
         private static VirtualAmiiboFile LoadAmiiboFile(string amiiboId)
         {
-            if (amiiboId.Contains("..") || amiiboId.Contains("/") || amiiboId.Contains("\\") || amiiboId.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
-            {
-                throw new ArgumentException("Invalid amiiboId");
-            }
+            ValidateAmiiboId(amiiboId);
 
             string amiiboDir = Path.GetFullPath(Path.Join(AppDataManager.BaseDirPath, "system", "amiibo"));
 
@@ -213,10 +210,7 @@ namespace Ryujinx.HLE.HOS.Services.Nfc.Nfp
 
         private static void SaveAmiiboFile(VirtualAmiiboFile virtualAmiiboFile)
         {
-            if (virtualAmiiboFile.AmiiboId.Contains("..") || virtualAmiiboFile.AmiiboId.Contains("/") || virtualAmiiboFile.AmiiboId.Contains("\\") || virtualAmiiboFile.AmiiboId.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
-            {
-                throw new ArgumentException("Invalid amiiboId");
-            }
+            ValidateAmiiboId(virtualAmiiboFile.AmiiboId);
 
             string amiiboDir = Path.GetFullPath(Path.Join(AppDataManager.BaseDirPath, "system", "amiibo"));
 
@@ -233,6 +227,14 @@ namespace Ryujinx.HLE.HOS.Services.Nfc.Nfp
             }
 
             JsonHelper.SerializeToFile(filePath, virtualAmiiboFile, _serializerContext.VirtualAmiiboFile);
+        }
+
+        private static void ValidateAmiiboId(string amiiboId)
+        {
+            if (amiiboId.Contains("..") || amiiboId.Contains("/") || amiiboId.Contains("\\") || amiiboId.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            {
+                throw new ArgumentException("Invalid amiiboId");
+            }
         }
     }
 }
