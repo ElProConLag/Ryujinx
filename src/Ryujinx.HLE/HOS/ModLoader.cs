@@ -753,7 +753,7 @@ namespace Ryujinx.HLE.HOS
             var contentDirectory = FindApplicationDir(new DirectoryInfo(Path.Combine(GetModsBasePath(), AmsContentsDir)), $"{applicationId:x16}");
             string enabledCheatsPath = Path.Combine(contentDirectory.FullName, CheatDir, "enabled.txt");
 
-            if (File.Exists(enabledCheatsPath))
+            if (IsValidPath(enabledCheatsPath) && File.Exists(enabledCheatsPath))
             {
                 tamperMachine.EnableCheats(File.ReadAllLines(enabledCheatsPath));
             }
@@ -836,6 +836,14 @@ namespace Ryujinx.HLE.HOS
             }
 
             return count > 0;
+        }
+        private static bool IsValidPath(string path)
+        {
+            if (path.Contains("..") || path.Contains("/") || path.Contains("\\"))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
