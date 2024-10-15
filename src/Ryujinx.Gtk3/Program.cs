@@ -158,6 +158,13 @@ namespace Ryujinx
             string localConfigurationPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ReleaseInformation.ConfigName);
             string appDataConfigurationPath = Path.Combine(AppDataManager.BaseDirPath, ReleaseInformation.ConfigName);
 
+            // Validate appDataConfigurationPath to ensure it is within the expected base directory
+            if (!Path.GetFullPath(appDataConfigurationPath).StartsWith(Path.GetFullPath(AppDataManager.BaseDirPath) + Path.DirectorySeparatorChar))
+            {
+                Logger.Error?.Print(LogClass.Application, $"Invalid configuration path: {appDataConfigurationPath}. Falling back to default configuration path.");
+                appDataConfigurationPath = null;
+            }
+
             // Now load the configuration as the other subsystems are now registered
             ConfigurationPath = File.Exists(localConfigurationPath)
                 ? localConfigurationPath
