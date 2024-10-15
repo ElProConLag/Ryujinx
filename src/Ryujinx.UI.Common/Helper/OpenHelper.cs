@@ -23,13 +23,13 @@ namespace Ryujinx.UI.Common.Helper
             try
             {
                 string fullPath = Path.GetFullPath(path);
-                if (Directory.Exists(fullPath) && IsPathAllowed(fullPath))
+                if (Directory.Exists(fullPath) && IsPathAllowed(fullPath) && IsWhitelisted(fullPath))
                 {
                     Process.Start(new ProcessStartInfo
                     {
-                        FileName = fullPath,
-                        UseShellExecute = true,
-                        Verb = "open",
+                        FileName = "explorer.exe",
+                        Arguments = fullPath,
+                        UseShellExecute = false,
                     });
                 }
                 else
@@ -120,6 +120,12 @@ namespace Ryujinx.UI.Common.Helper
         private static bool IsPathAllowed(string path)
         {
             string[] allowedDirectories = { "C:\\AllowedPath1", "C:\\AllowedPath2" }; // Add allowed directories here
+            return allowedDirectories.Any(allowedDir => path.StartsWith(allowedDir, StringComparison.OrdinalIgnoreCase));
+        }
+        private static bool IsWhitelisted(string path)
+        {
+            // Define a list of allowed directories
+            string[] allowedDirectories = { "C:\\AllowedDir1", "C:\\AllowedDir2" };
             return allowedDirectories.Any(allowedDir => path.StartsWith(allowedDir, StringComparison.OrdinalIgnoreCase));
         }
     }
