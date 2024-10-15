@@ -223,7 +223,7 @@ namespace Ryujinx.Ava.UI.ViewModels
             {
                 try
                 {
-                    if (File.Exists(_amiiboJsonPath))
+                    if (IsPathWithinBaseDir(_amiiboJsonPath) && File.Exists(_amiiboJsonPath))
                     {
                         localIsValid = TryGetAmiiboJson(await File.ReadAllTextAsync(_amiiboJsonPath), out amiiboJson);
                     }
@@ -515,4 +515,11 @@ namespace Ryujinx.Ava.UI.ViewModels
                 LocaleManager.Instance[LocaleKeys.RyujinxInfo]);
         }
     }
+        private bool IsPathWithinBaseDir(string path)
+        {
+            string baseDirFullPath = Path.GetFullPath(AppDataManager.BaseDirPath);
+            string fullPath = Path.GetFullPath(path);
+
+            return fullPath.StartsWith(baseDirFullPath + Path.DirectorySeparatorChar);
+        }
 }
