@@ -22,6 +22,13 @@ namespace Ryujinx.Common.Logging.Targets
 
         public static FileStream PrepareLogFile(string path)
         {
+            // Validate the path
+            if (path.Contains("..") || path.Contains("/") || path.Contains("\\"))
+            {
+                Logger.Warning?.Print(LogClass.Application, $"Logging directory path ('{path}') is invalid.");
+                return null;
+            }
+
             // Ensure directory is present
             DirectoryInfo logDir;
             try
