@@ -1,4 +1,5 @@
 using Ryujinx.Common.Logging;
+using System.Linq;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -19,18 +20,26 @@ namespace Ryujinx.UI.Common.Helper
 
         public static void OpenFolder(string path)
         {
-            if (Directory.Exists(path))
+            try
             {
-                Process.Start(new ProcessStartInfo
+                string fullPath = Path.GetFullPath(path);
+                if (Directory.Exists(fullPath) && IsPathAllowed(fullPath))
                 {
-                    FileName = path,
-                    UseShellExecute = true,
-                    Verb = "open",
-                });
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = fullPath,
+                        UseShellExecute = true,
+                        Verb = "open",
+                    });
+                }
+                else
+                {
+                    Logger.Notice.Print(LogClass.Application, $"Directory \"{path}\" doesn't exist or is not allowed!");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Logger.Notice.Print(LogClass.Application, $"Directory \"{path}\" doesn't exist!");
+                Logger.Error.Print(LogClass.Application, $"Failed to open directory \"{path}\": {ex.Message}");
             }
         }
 
@@ -107,6 +116,11 @@ namespace Ryujinx.UI.Common.Helper
             {
                 Logger.Notice.Print(LogClass.Application, $"Cannot open url \"{url}\" on this platform!");
             }
+        }
+        private static bool IsPathAllowed(string path)
+        {
+            string[] allowedDirectories = { "C:\\AllowedPath1", "C:\\AllowedPath2" }; // Add allowed directories here
+            return allowedDirectories.Any(allowedDir => path.StartsWith(allowedDir, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
