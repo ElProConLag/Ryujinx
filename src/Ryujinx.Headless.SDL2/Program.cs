@@ -287,6 +287,13 @@ namespace Ryujinx.Headless.SDL2
                     profileBasePath = Path.Combine(AppDataManager.ProfilesDirPath, "controller");
                 }
 
+                // Validate inputProfileName to prevent directory traversal
+                if (inputProfileName.Contains("..") || inputProfileName.Contains("/") || inputProfileName.Contains("\\"))
+                {
+                    Logger.Error?.Print(LogClass.Application, $"Invalid input profile name \"{inputProfileName}\" for \"{inputId}\"");
+                    return null;
+                }
+
                 string path = Path.Combine(profileBasePath, inputProfileName + ".json");
 
                 if (!File.Exists(path))
