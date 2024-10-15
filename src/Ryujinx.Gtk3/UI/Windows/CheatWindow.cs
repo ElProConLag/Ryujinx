@@ -30,6 +30,11 @@ namespace Ryujinx.UI.Windows
         {
             builder.Autoconnect(this);
 
+            bool IsValidPath(string path)
+            {
+                return !path.Contains("..") && !path.Contains("/") && !path.Contains("\\");
+            }
+
             IntegrityCheckLevel checkLevel = ConfigurationState.Instance.System.EnableFsIntegrityChecks
                 ? IntegrityCheckLevel.ErrorOnInvalid
                 : IntegrityCheckLevel.None;
@@ -41,6 +46,11 @@ namespace Ryujinx.UI.Windows
             string titleModsPath = ModLoader.GetApplicationDir(modsBasePath, titleId.ToString("X16"));
 
             _enabledCheatsPath = System.IO.Path.Combine(titleModsPath, "cheats", "enabled.txt");
+
+            if (!IsValidPath(_enabledCheatsPath))
+            {
+                throw new InvalidOperationException("Invalid path detected.");
+            }
 
             _cheatTreeView.Model = new TreeStore(typeof(bool), typeof(string), typeof(string), typeof(string));
 
