@@ -1118,6 +1118,12 @@ namespace Ryujinx.UI.Windows
             }
             else
             {
+                if (_profile.ActiveId.Contains("..") || _profile.ActiveId.Contains("/") || _profile.ActiveId.Contains("\\"))
+                {
+                    Logger.Warning?.Print(LogClass.Application, "Invalid profile ID detected.");
+                    return;
+                }
+
                 string path = System.IO.Path.Combine(GetProfileBasePath(), _profile.ActiveId);
 
                 if (!File.Exists(path))
