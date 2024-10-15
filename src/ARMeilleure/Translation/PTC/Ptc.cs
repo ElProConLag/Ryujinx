@@ -129,6 +129,17 @@ namespace ARMeilleure.Translation.PTC
             string workPathActual = Path.Combine(AppDataManager.GamesDirPath, TitleIdText, "cache", "cpu", ActualDir);
             string workPathBackup = Path.Combine(AppDataManager.GamesDirPath, TitleIdText, "cache", "cpu", BackupDir);
 
+            // Validate workPathActual and workPathBackup to prevent path traversal
+            string safeGamesDirPath = Path.GetFullPath(AppDataManager.GamesDirPath);
+            workPathActual = Path.GetFullPath(workPathActual);
+            workPathBackup = Path.GetFullPath(workPathBackup);
+
+            if (!workPathActual.StartsWith(safeGamesDirPath + Path.DirectorySeparatorChar) ||
+                !workPathBackup.StartsWith(safeGamesDirPath + Path.DirectorySeparatorChar))
+            {
+                throw new InvalidOperationException("Work path is outside the allowed directory.");
+            }
+
             if (!Directory.Exists(workPathActual))
             {
                 Directory.CreateDirectory(workPathActual);

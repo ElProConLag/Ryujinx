@@ -114,6 +114,13 @@ namespace Ryujinx.Common.Configuration
                 throw new InvalidOperationException("Invalid base directory path detected.");
             }
 
+            // Ensure BaseDirPath is within a safe directory
+            string safeBaseDir = Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+            if (!BaseDirPath.StartsWith(safeBaseDir + Path.DirectorySeparatorChar))
+            {
+                throw new InvalidOperationException("Base directory path is outside the allowed directory.");
+            }
+
             if (IsPathSymlink(BaseDirPath))
             {
                 Logger.Warning?.Print(LogClass.Application, $"Application data directory is a symlink. This may be unintended.");
