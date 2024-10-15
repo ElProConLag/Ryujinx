@@ -61,9 +61,19 @@ namespace Ryujinx.UI.Windows
                 Timeout = TimeSpan.FromSeconds(30),
             };
 
-            Directory.CreateDirectory(System.IO.Path.Join(AppDataManager.BaseDirPath, "system", "amiibo"));
+            string amiiboDir = System.IO.Path.Join(AppDataManager.BaseDirPath, "system", "amiibo");
+            Directory.CreateDirectory(amiiboDir);
 
-            _amiiboJsonPath = System.IO.Path.Join(AppDataManager.BaseDirPath, "system", "amiibo", "Amiibo.json");
+            _amiiboJsonPath = System.IO.Path.Join(amiiboDir, "Amiibo.json");
+
+            // Validate the constructed path
+            string fullPath = Path.GetFullPath(_amiiboJsonPath);
+            if (!fullPath.StartsWith(amiiboDir + Path.DirectorySeparatorChar))
+            {
+                Logger.Error?.Print(LogClass.Application, $"Invalid path detected: {_amiiboJsonPath}");
+                throw new InvalidOperationException("Invalid path detected.");
+            }
+
             _amiiboList = new List<AmiiboApi>();
 
             _amiiboLogoBytes = EmbeddedResources.Read("Ryujinx.UI.Common/Resources/Logo_Amiibo.png");
