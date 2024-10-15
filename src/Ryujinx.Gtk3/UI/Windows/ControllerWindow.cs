@@ -779,6 +779,12 @@ namespace Ryujinx.UI.Windows
             return AppDataManager.ProfilesDirPath;
         }
 
+        private bool IsPathValid(string path, string basePath)
+        {
+            string fullPath = Path.GetFullPath(path);
+            return fullPath.StartsWith(basePath + Path.DirectorySeparatorChar);
+        }
+
         //
         // Events
         //
@@ -1154,6 +1160,11 @@ namespace Ryujinx.UI.Windows
             if (profileDialog.Run() == (int)ResponseType.Ok)
             {
                 string path = System.IO.Path.Combine(GetProfileBasePath(), profileDialog.FileName);
+                if (!IsPathValid(path, GetProfileBasePath()))
+                {
+                    // Handle invalid path scenario
+                    return;
+                }
                 string jsonString = JsonHelper.Serialize(inputConfig, _serializerContext.InputConfig);
 
                 File.WriteAllText(path, jsonString);
@@ -1178,7 +1189,11 @@ namespace Ryujinx.UI.Windows
             if (confirmDialog.Run() == (int)ResponseType.Yes)
             {
                 string path = System.IO.Path.Combine(GetProfileBasePath(), _profile.ActiveId);
-
+                if (!IsPathValid(path, GetProfileBasePath()))
+                {
+                    // Handle invalid path scenario
+                    return;
+                }
                 if (File.Exists(path))
                 {
                     File.Delete(path);
