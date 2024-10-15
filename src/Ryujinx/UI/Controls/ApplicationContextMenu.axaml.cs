@@ -283,13 +283,19 @@ namespace Ryujinx.Ava.UI.Controls
             if (viewModel?.SelectedApplication != null)
             {
                 string shaderCacheDir = Path.Combine(AppDataManager.GamesDirPath, viewModel.SelectedApplication.IdString, "cache", "shader");
+                string normalizedShaderCacheDir = Path.GetFullPath(shaderCacheDir);
 
-                if (!Directory.Exists(shaderCacheDir))
+                if (!normalizedShaderCacheDir.StartsWith(Path.GetFullPath(AppDataManager.GamesDirPath) + Path.DirectorySeparatorChar))
                 {
-                    Directory.CreateDirectory(shaderCacheDir);
+                    throw new UnauthorizedAccessException("Invalid path");
                 }
 
-                OpenHelper.OpenFolder(shaderCacheDir);
+                if (!Directory.Exists(normalizedShaderCacheDir))
+                {
+                    Directory.CreateDirectory(normalizedShaderCacheDir);
+                }
+
+                OpenHelper.OpenFolder(normalizedShaderCacheDir);
             }
         }
 
