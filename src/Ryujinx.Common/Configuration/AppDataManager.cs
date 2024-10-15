@@ -108,6 +108,12 @@ namespace Ryujinx.Common.Configuration
 
             BaseDirPath = Path.GetFullPath(BaseDirPath); // convert relative paths
 
+            // Validate the BaseDirPath to prevent path traversal
+            if (BaseDirPath.Contains("..") || BaseDirPath.Contains("/") || BaseDirPath.Contains("\\"))
+            {
+                throw new InvalidOperationException("Invalid base directory path detected.");
+            }
+
             if (IsPathSymlink(BaseDirPath))
             {
                 Logger.Warning?.Print(LogClass.Application, $"Application data directory is a symlink. This may be unintended.");
