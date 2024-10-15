@@ -37,7 +37,21 @@ namespace Ryujinx.Modules
         private static readonly string _homeDir = AppDomain.CurrentDomain.BaseDirectory;
         private static readonly string _updateDir = Path.Combine(Path.GetTempPath(), "Ryujinx", "update");
         private static readonly string _updatePublishDir = Path.Combine(_updateDir, "publish");
+
+        static Updater()
+        {
+            ValidatePathWithinDirectory(Path.GetTempPath(), _updateDir);
+        }
         private const int ConnectionCount = 4;
+
+        private static void ValidatePathWithinDirectory(string baseDir, string path)
+        {
+            string fullPath = Path.GetFullPath(path);
+            if (!fullPath.StartsWith(Path.GetFullPath(baseDir) + Path.DirectorySeparatorChar))
+            {
+                throw new UnauthorizedAccessException("Attempt to access outside of the base directory.");
+            }
+        }
 
         private static string _buildVer;
         private static string _platformExt;
@@ -518,6 +532,7 @@ namespace Ryujinx.Modules
         private static void ExtractTarGzipFile(TaskDialog taskDialog, string archivePath, string outputDirectoryPath)
         {
             ValidatePath(outputDirectoryPath);
+            ValidatePathWithinDirectory(_updateDir, outputDirectoryPath);
 
             using Stream inStream = File.OpenRead(archivePath);
             using GZipInputStream gzipStream = new(inStream);
@@ -563,6 +578,7 @@ namespace Ryujinx.Modules
         private static void ExtractZipFile(TaskDialog taskDialog, string archivePath, string outputDirectoryPath)
         {
             ValidatePath(outputDirectoryPath);
+            ValidatePathWithinDirectory(_updateDir, outputDirectoryPath);
 
             using Stream inStream = File.OpenRead(archivePath);
             using ZipFile zipFile = new(inStream);
