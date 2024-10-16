@@ -83,7 +83,7 @@ namespace Ryujinx.Common.Configuration
 
             if (baseDirPath != null && baseDirPath != userProfilePath)
             {
-                if (baseDirPath.Contains("..") || baseDirPath.Contains("/") || baseDirPath.Contains("\\"))
+                if (baseDirPath.Contains("..") || baseDirPath.Contains("/") || baseDirPath.Contains("\\") || baseDirPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
                 {
                     Logger.Error?.Print(LogClass.Application, $"Invalid custom data directory '{baseDirPath}'. Falling back to {Mode}...");
                 }
