@@ -105,6 +105,11 @@ namespace Ryujinx.Ava.UI.ViewModels
 
             _downloadableContentJsonPath = Path.Combine(AppDataManager.GamesDirPath, applicationData.IdBaseString, "dlc.json");
 
+            if (!IsPathValid(_downloadableContentJsonPath, AppDataManager.GamesDirPath))
+            {
+                throw new UnauthorizedAccessException("Invalid path detected.");
+            }
+
             if (!File.Exists(_downloadableContentJsonPath))
             {
                 _downloadableContentContainerList = new List<DownloadableContentContainer>();
@@ -123,6 +128,14 @@ namespace Ryujinx.Ava.UI.ViewModels
             }
 
             LoadDownloadableContents();
+        }
+
+        private bool IsPathValid(string path, string baseDir)
+        {
+            string fullPath = Path.GetFullPath(path);
+            string fullBaseDir = Path.GetFullPath(baseDir);
+
+            return fullPath.StartsWith(fullBaseDir + Path.DirectorySeparatorChar);
         }
 
         private void LoadDownloadableContents()
