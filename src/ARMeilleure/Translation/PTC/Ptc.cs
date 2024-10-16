@@ -134,7 +134,9 @@ namespace ARMeilleure.Translation.PTC
             workPathActual = Path.GetFullPath(workPathActual);
             workPathBackup = Path.GetFullPath(workPathBackup);
 
-            if (!workPathActual.StartsWith(safeGamesDirPath + Path.DirectorySeparatorChar) ||
+            if (workPathActual.Contains("..") || workPathActual.Contains(Path.DirectorySeparatorChar.ToString()) ||
+                workPathBackup.Contains("..") || workPathBackup.Contains(Path.DirectorySeparatorChar.ToString()) ||
+                !workPathActual.StartsWith(safeGamesDirPath + Path.DirectorySeparatorChar) ||
                 !workPathBackup.StartsWith(safeGamesDirPath + Path.DirectorySeparatorChar))
             {
                 throw new InvalidOperationException("Work path is outside the allowed directory.");
