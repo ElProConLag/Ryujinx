@@ -35,6 +35,16 @@ namespace Ryujinx.Ava.UI.Windows
 
         public CheatWindow(VirtualFileSystem virtualFileSystem, string titleId, string titleName, string titlePath)
         {
+            if (string.IsNullOrWhiteSpace(titleId) || titleId.Contains("..") || titleId.Contains("/") || titleId.Contains("\\"))
+            {
+                throw new ArgumentException("Invalid titleId");
+            }
+
+            if (string.IsNullOrWhiteSpace(titlePath) || titlePath.Contains("..") || titlePath.Contains("/") || titlePath.Contains("\\"))
+            {
+                throw new ArgumentException("Invalid titlePath");
+            }
+
             LoadedCheats = new AvaloniaList<CheatNode>();
             IntegrityCheckLevel checkLevel = ConfigurationState.Instance.System.EnableFsIntegrityChecks
                 ? IntegrityCheckLevel.ErrorOnInvalid
