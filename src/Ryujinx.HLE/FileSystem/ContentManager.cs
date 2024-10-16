@@ -557,7 +557,12 @@ namespace Ryujinx.HLE.FileSystem
 
         public static void SaveNca(Nca nca, string ncaId, string temporaryDirectory)
         {
-            string newPath = Path.Combine(temporaryDirectory, ncaId + ".nca");
+            string newPath = Path.GetFullPath(Path.Combine(temporaryDirectory, ncaId + ".nca"));
+            string fullTempDirPath = Path.GetFullPath(temporaryDirectory + Path.DirectorySeparatorChar);
+            if (!newPath.StartsWith(fullTempDirPath))
+            {
+                throw new InvalidOperationException("Entry is outside the target dir: " + newPath);
+            }
 
             Directory.CreateDirectory(newPath);
 
