@@ -258,11 +258,13 @@ namespace Ryujinx.Modules
             _updateSuccessful = false;
 
             // Empty update dir, although it shouldn't ever have anything inside it
+            ValidatePathWithinDirectory(Path.GetTempPath(), _updateDir);
+
             if (Directory.Exists(_updateDir))
             {
                 Directory.Delete(_updateDir, true);
             }
-
+                
             Directory.CreateDirectory(_updateDir);
 
             string updateFile = Path.Combine(_updateDir, "update.bin");
