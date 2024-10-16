@@ -514,6 +514,12 @@ namespace Ryujinx.UI.Widgets
 
         private void OpenPtcDir_Clicked(object sender, EventArgs args)
         {
+            if (ContainsInvalidPathChars(_applicationData.IdString))
+            {
+                // Handle invalid path case, e.g., show an error message to the user
+                return;
+            }
+
             string ptcDir = System.IO.Path.Combine(AppDataManager.GamesDirPath, _applicationData.IdString, "cache", "cpu");
 
             string mainPath = System.IO.Path.Combine(ptcDir, "0");
@@ -531,6 +537,12 @@ namespace Ryujinx.UI.Widgets
 
         private void OpenShaderCacheDir_Clicked(object sender, EventArgs args)
         {
+            if (ContainsInvalidPathChars(_applicationData.IdString))
+            {
+                // Handle invalid path case, e.g., show an error message to the user
+                return;
+            }
+
             string shaderCacheDir = System.IO.Path.Combine(AppDataManager.GamesDirPath, _applicationData.IdString, "cache", "shader");
 
             if (!Directory.Exists(shaderCacheDir))
@@ -631,4 +643,8 @@ namespace Ryujinx.UI.Widgets
             ShortcutHelper.CreateAppShortcut(_applicationData.Path, _applicationData.Name, _applicationData.IdString, appIcon);
         }
     }
+        private bool ContainsInvalidPathChars(string path)
+        {
+            return path.Contains("..") || path.Contains("/") || path.Contains("\\");
+        }
 }
