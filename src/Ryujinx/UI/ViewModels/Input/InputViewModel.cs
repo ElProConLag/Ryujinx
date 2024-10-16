@@ -491,9 +491,11 @@ namespace Ryujinx.Ava.UI.ViewModels.Input
                 path = Path.Combine(path, ControllerString);
             }
 
-            // Validate the path to ensure it is within the ProfilesDirPath
+            // Normalize and validate the path to ensure it is within the ProfilesDirPath
             string fullPath = Path.GetFullPath(path);
-            if (!fullPath.StartsWith(AppDataManager.ProfilesDirPath))
+            string baseDir = Path.GetFullPath(AppDataManager.ProfilesDirPath);
+
+            if (!fullPath.StartsWith(baseDir + Path.DirectorySeparatorChar) && fullPath != baseDir)
             {
                 throw new InvalidOperationException("Invalid profile base path detected.");
             }
