@@ -43,6 +43,10 @@ namespace Ryujinx.Common.Utilities
 
         public static void SerializeToFile<T>(string filePath, T value, JsonTypeInfo<T> typeInfo)
         {
+            if (!IsValidPath(filePath))
+            {
+                throw new ArgumentException("Invalid file path.");
+            }
             using FileStream file = File.Create(filePath, DefaultFileWriteBufferSize, FileOptions.WriteThrough);
             JsonSerializer.Serialize(file, value, typeInfo);
         }
