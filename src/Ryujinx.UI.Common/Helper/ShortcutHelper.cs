@@ -11,6 +11,15 @@ namespace Ryujinx.UI.Common.Helper
 {
     public static class ShortcutHelper
     {
+        private static bool IsValidPath(string path)
+        {
+            // Check for invalid path characters and sequences
+            if (path.Contains("..") || path.Contains("/") || path.Contains("\\"))
+            {
+                return false;
+            }
+            return true;
+        }
         [SupportedOSPlatform("windows")]
         private static void CreateShortcutWindows(string applicationFilePath, string applicationId, byte[] iconData, string iconPath, string cleanedAppName, string desktopPath)
         {
@@ -33,6 +42,11 @@ namespace Ryujinx.UI.Common.Helper
             string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Ryujinx.sh");
             var desktopFile = EmbeddedResources.ReadAllText("Ryujinx.UI.Common/shortcut-template.desktop");
             iconPath += ".png";
+
+            if (!IsValidPath(iconPath))
+            {
+                throw new ArgumentException("Invalid icon path.");
+            }
 
             var image = SKBitmap.Decode(iconData);
             using var data = image.Encode(SKEncodedImageFormat.Png, 100);
