@@ -189,6 +189,19 @@ namespace Ryujinx.Ava.UI.ViewModels
             var basePath = model.InSd ? ModLoader.GetSdModsBasePath() : ModLoader.GetModsBasePath();
             var modsDir = ModLoader.GetApplicationDir(basePath, _applicationId.ToString("x16"));
 
+            // Validate modsDir to ensure it is within a safe directory
+            var safeBaseDir = Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+            if (!modsDir.StartsWith(safeBaseDir + Path.DirectorySeparatorChar))
+            {
+                Dispatcher.UIThread.Post(async () =>
+                {
+                    await ContentDialogHelper.CreateErrorDialog(LocaleManager.Instance.UpdateAndGetDynamicValue(
+                        LocaleKeys.DialogModDeleteNoParentMessage,
+                        model.Path));
+                });
+                return;
+            }
+
             if (new DirectoryInfo(model.Path).Parent?.FullName == modsDir)
             {
                 isSubdir = false;
