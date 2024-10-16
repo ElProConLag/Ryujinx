@@ -22,6 +22,11 @@ using System.Threading.Tasks;
 
 namespace Ryujinx.Ava.UI.ViewModels
 {
+    private bool IsPathWithinBaseDir(string baseDir, string path)
+    {
+        string fullPath = Path.GetFullPath(path);
+        return fullPath.StartsWith(Path.GetFullPath(baseDir) + Path.DirectorySeparatorChar);
+    }
     public class AmiiboWindowViewModel : BaseModel, IDisposable
     {
         private const string DefaultJson = "{ \"amiibo\": [] }";
@@ -223,7 +228,7 @@ namespace Ryujinx.Ava.UI.ViewModels
             {
                 try
                 {
-                    if (IsPathWithinBaseDir(_amiiboJsonPath) && File.Exists(_amiiboJsonPath))
+                    if (IsPathWithinBaseDir(AppDataManager.BaseDirPath, _amiiboJsonPath) && File.Exists(_amiiboJsonPath))
                     {
                         localIsValid = TryGetAmiiboJson(await File.ReadAllTextAsync(_amiiboJsonPath), out amiiboJson);
                     }
@@ -440,8 +445,15 @@ namespace Ryujinx.Ava.UI.ViewModels
 
                     try
                     {
-                        using FileStream dlcJsonStream = File.Create(_amiiboJsonPath, 4096, FileOptions.WriteThrough);
-                        dlcJsonStream.Write(Encoding.UTF8.GetBytes(amiiboJsonString));
+                        if (IsPathWithinBaseDir(AppDataManager.BaseDirPath, _amiiboJsonPath))
+                        {
+                            using FileStream dlcJsonStream = File.Create(_amiiboJsonPath, 4096, FileOptions.WriteThrough);
+                            dlcJsonStream.Write(Encoding.UTF8.GetBytes(amiiboJsonString));
+                        }
+                        else
+                        {
+                            Logger.Warning?.Print(LogClass.Application, $"Invalid path for amiibo data: {_amiiboJsonPath}");
+                        }
                     }
                     catch (Exception exception)
                     {
