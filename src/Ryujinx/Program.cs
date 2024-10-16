@@ -135,6 +135,13 @@ namespace Ryujinx.Ava
             }
         }
 
+        private static bool IsValidPath(string basePath, string path)
+        {
+            string fullPath = Path.GetFullPath(path);
+            return fullPath.StartsWith(Path.GetFullPath(basePath) + Path.DirectorySeparatorChar) &&
+                   !path.Contains("..") && !path.Contains("/") && !path.Contains("\\");
+        }
+
         public static void ReloadConfig()
         {
             string localConfigurationPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ReleaseInformation.ConfigName);
@@ -145,7 +152,7 @@ namespace Ryujinx.Ava
             {
                 ConfigurationPath = localConfigurationPath;
             }
-            else if (File.Exists(appDataConfigurationPath))
+            else if (IsValidPath(AppDataManager.BaseDirPath, appDataConfigurationPath) && File.Exists(appDataConfigurationPath))
             {
                 ConfigurationPath = appDataConfigurationPath;
             }
