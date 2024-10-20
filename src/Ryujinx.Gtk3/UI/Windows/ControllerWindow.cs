@@ -1137,9 +1137,17 @@ namespace Ryujinx.UI.Windows
                     return;
                 }
 
-                string path = System.IO.Path.Combine(GetProfileBasePath(), _profile.ActiveId);
+                string basePath = GetProfileBasePath();
+                string path = System.IO.Path.Combine(basePath, _profile.ActiveId);
+                string fullPath = Path.GetFullPath(path);
 
-                if (!File.Exists(path))
+                if (!fullPath.StartsWith(basePath + Path.DirectorySeparatorChar))
+                {
+                    Logger.Warning?.Print(LogClass.Application, "Invalid profile path detected.");
+                    return;
+                }
+
+                if (!File.Exists(fullPath))
                 {
                     if (pos >= 0)
                     {
