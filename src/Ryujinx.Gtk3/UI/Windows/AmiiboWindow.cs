@@ -68,7 +68,7 @@ namespace Ryujinx.UI.Windows
 
             // Validate the constructed path
             string fullPath = Path.GetFullPath(_amiiboJsonPath);
-            if (!fullPath.StartsWith(amiiboDir + Path.DirectorySeparatorChar) || fullPath.Contains(".."))
+            if (!fullPath.StartsWith(Path.GetFullPath(amiiboDir) + Path.DirectorySeparatorChar))
             {
                 Logger.Error?.Print(LogClass.Application, $"Invalid path detected: {_amiiboJsonPath}");
                 throw new InvalidOperationException("Invalid path detected.");
