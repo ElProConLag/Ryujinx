@@ -533,6 +533,7 @@ namespace Ryujinx.Modules
                 MoveAllFilesOver(_updatePublishDir, _homeDir, updateDialog);
             });
 
+            Updater.ValidatePathWithinDirectory(Path.GetTempPath(), _updateDir);
             Directory.Delete(_updateDir, true);
 
             updateDialog.MainText.Text = "Update Complete!";
