@@ -382,21 +382,28 @@ namespace Ryujinx.UI
 
                         string filename = $"{sanitizedApplicationName}_{currentTime.Year}-{currentTime.Month:D2}-{currentTime.Day:D2}_{currentTime.Hour:D2}-{currentTime.Minute:D2}-{currentTime.Second:D2}.png";
 
-                        string directory = AppDataManager.Mode switch
+                        string baseDirectory = AppDataManager.Mode switch
                         {
                             AppDataManager.LaunchMode.Portable or AppDataManager.LaunchMode.Custom => System.IO.Path.Combine(AppDataManager.BaseDirPath, "screenshots"),
                             _ => System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Ryujinx"),
                         };
 
-                        string path = System.IO.Path.Combine(directory, filename);
+                        string path = System.IO.Path.Combine(baseDirectory, filename);
+
+                        // Validate that the path is within the intended directory
+                        if (!path.StartsWith(baseDirectory + Path.DirectorySeparatorChar))
+                        {
+                            Logger.Error?.Print(LogClass.Application, $"Invalid path: {path}", "Screenshot");
+                            return;
+                        }
 
                         try
                         {
-                            Directory.CreateDirectory(directory);
+                            Directory.CreateDirectory(baseDirectory);
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error?.Print(LogClass.Application, $"Failed to create directory at path {directory}. Error : {ex.GetType().Name}", "Screenshot");
+                            Logger.Error?.Print(LogClass.Application, $"Failed to create directory at path {baseDirectory}. Error : {ex.GetType().Name}", "Screenshot");
 
                             return;
                         }
