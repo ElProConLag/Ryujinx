@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Linq;
 
 namespace Ryujinx.Graphics.Gpu.Shader.DiskCache
 {
@@ -194,14 +195,15 @@ namespace Ryujinx.Graphics.Gpu.Shader.DiskCache
         /// <param name="basePath">Base path of the shader cache</param>
         public DiskCacheHostStorage(string basePath)
         {
-            _basePath = basePath;
-            _guestStorage = new DiskCacheGuestStorage(basePath);
+            _basePath = ValidateBasePath(basePath);
+            _guestStorage = new DiskCacheGuestStorage(_basePath);
 
             if (CacheEnabled)
             {
-                Directory.CreateDirectory(basePath);
+                Directory.CreateDirectory(_basePath);
             }
         }
+
 
         /// <summary>
         /// Gets the total of host programs on the cache.
@@ -867,4 +869,16 @@ namespace Ryujinx.Graphics.Gpu.Shader.DiskCache
             }
         }
     }
-}
+        private string ValidateBasePath(string basePath)
+        {
+            string safeBaseDir = Path.GetFullPath(AppDataManager.GamesDirPath);
+            string fullPath = Path.GetFullPath(basePath);
+
+            if (!fullPath.StartsWith(safeBaseDir) || fullPath.Any(c => Path.GetInvalidPathChars().Contains(c)))
+            {
+                throw new ArgumentException("Invalid base path");
+            }
+
+            return fullPath;
+        }
+    }
