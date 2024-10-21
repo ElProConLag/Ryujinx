@@ -91,6 +91,11 @@ namespace Ryujinx.HLE.HOS.Services.Ssl
         {
             string customCertificatePath = System.IO.Path.Join(AppDataManager.BaseDirPath, "system", "ssl", $"{entry.Id}.der");
 
+            if (!IsPathSafe(customCertificatePath, AppDataManager.BaseDirPath))
+            {
+                throw new UnauthorizedAccessException("Invalid path detected.");
+            }
+
             byte[] data;
 
             if (File.Exists(customCertificatePath))
@@ -240,4 +245,9 @@ namespace Ryujinx.HLE.HOS.Services.Ssl
             }
         }
     }
+        private bool IsPathSafe(string path, string baseDir)
+        {
+            string fullPath = Path.GetFullPath(path);
+            return fullPath.StartsWith(Path.GetFullPath(baseDir) + Path.DirectorySeparatorChar) && !fullPath.Contains("..");
+        }
 }
