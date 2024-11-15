@@ -19,6 +19,12 @@ parser.add_argument("rglob", help="rglob")
 
 args = parser.parse_args()
 
+def validate_and_normalize_path(base_path: str, user_path: str) -> Path:
+    normalized_path = os.path.normpath(user_path)
+    if not normalized_path.startswith(base_path):
+        raise Exception(f"Path {user_path} is not allowed")
+    return Path(normalized_path)
+
 # Use Apple LLVM on Darwin, otherwise standard LLVM.
 if platform.system() == "Darwin":
     LIPO = "lipo"
@@ -35,9 +41,10 @@ else:
 if LIPO is None:
     raise Exception("Cannot find a valid location for LLVM lipo!")
 
-arm64_input_directory: Path = Path(args.arm64_input_directory)
-x86_64_input_directory: Path = Path(args.x86_64_input_directory)
-output_directory: Path = Path(args.output_directory)
+base_path = os.getcwd()
+arm64_input_directory: Path = validate_and_normalize_path(base_path, args.arm64_input_directory)
+x86_64_input_directory: Path = validate_and_normalize_path(base_path, args.x86_64_input_directory)
+output_directory: Path = validate_and_normalize_path(base_path, args.output_directory)
 rglob = args.rglob
 
 
