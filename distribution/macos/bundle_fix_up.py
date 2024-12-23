@@ -531,10 +531,11 @@ def write_bundle_data(
 
 input_directory: Path = Path(os.path.normpath(args.input_directory))
 content_directory: Path = Path(os.path.normpath(os.path.join(input_directory, "Contents")))
-executable_path: Path = Path(os.path.normpath(os.path.join(content_directory, args.executable_sub_path)))
+executable_sub_path: Path = Path(os.path.normpath(args.executable_sub_path))
+executable_path: Path = Path(os.path.normpath(os.path.join(content_directory, executable_sub_path)))
 if not str(content_directory).startswith(str(input_directory)):
     raise ValueError("Content directory is outside the allowed directory")
-if not str(executable_path).startswith(str(content_directory)):
+if not executable_path.is_relative_to(content_directory):
     raise ValueError("Executable path is outside the allowed directory")
 
 
